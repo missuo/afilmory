@@ -1,0 +1,19 @@
+{
+    "name": "Vincent's Gallery",
+    "title": "Vincent's Gallery",
+    "description": "Capturing beautiful moments in life",
+    "url": "https://vincent.ac",
+    "accentColor": "#fb7185",
+    "author": {
+        "name": "Vincent Yang",
+        "url": "https://vincent.moe",
+        "avatar": "https://r2.qwq.mx/avatar.jpeg"
+    },
+    "social": {
+        "twitter": "@m1ssuo",
+        "github": "missuo"
+    },
+    "extra": {
+        "accessRepo": true
+    }
+}
