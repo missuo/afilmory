@@ -10,6 +10,8 @@ import {
   generateThumbnailAndBlurhash,
   thumbnailExists,
 } from '../image/thumbnail.js'
+import { convertExifGPSToDecimal } from '../lib/geo/coords.js'
+import { reverseGeocode } from '../lib/geocoding/nominatim.js'
 import { decompressUint8Array } from '../lib/u8array.js'
 import { workdir } from '../path.js'
 import type {
@@ -134,4 +136,44 @@ export async function processToneAnalysis(
 
   // 计算新的影调分析
   return await calculateHistogramAndAnalyzeTone(sharpInstance)
+}
+
+/**
+ * 处理位置信息（反向地理编码）
+ * 复用现有数据，或根据 EXIF GPS 解析出城市/省份/国家
+ */
+export async function processLocation(
+  exifData: PickedExif | null,
+  photoKey: string,
+  existingItem: PhotoManifestItem | undefined,
+  options: PhotoProcessorOptions,
+): Promise<PhotoManifestItem['location']> {
+  const loggers = getGlobalLoggers()
+
+  // 复用现有
+  if (
+    !options.isForceMode &&
+    !options.isForceManifest &&
+    existingItem?.location
+  ) {
+    const photoId = path.basename(photoKey, path.extname(photoKey))
+    loggers.main.info(`复用现有位置信息：${photoId}`)
+    return existingItem.location
+  }
+
+  const coords = convertExifGPSToDecimal(exifData)
+  if (!coords) return null
+
+  try {
+    const geo = await reverseGeocode(coords.latitude, coords.longitude)
+    if (!geo) return null
+    return {
+      city: geo.city,
+      province: geo.province,
+      country: geo.country,
+    }
+  } catch (e) {
+    loggers.main.warn('反向地理编码失败，已跳过：', e)
+    return null
+  }
 }

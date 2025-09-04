@@ -45,6 +45,21 @@ export const ExifPanel: FC<{
   const decimalLatitude = gpsData?.latitude || null
   const decimalLongitude = gpsData?.longitude || null
 
+  const locationDisplay = useMemo(() => {
+    const loc = currentPhoto.location
+    if (!loc) return null
+    const city = loc.city || null
+    const province = loc.province || null
+    const country = loc.country || null
+
+    if (city && country) {
+      return province
+        ? `${city}, ${province}, ${country}`
+        : `${city}, ${country}`
+    }
+    return null
+  }, [currentPhoto])
+
   // 使用通用的图片格式提取函数
   const imageFormat = getImageFormat(
     currentPhoto.originalUrl || currentPhoto.s3Key || '',
@@ -577,6 +592,9 @@ export const ExifPanel: FC<{
                         label={t('exif.gps.altitude')}
                         value={`${formattedExifData.gps.altitude}m`}
                       />
+                    )}
+                    {locationDisplay && (
+                      <Row label={'Location'} value={locationDisplay} />
                     )}
 
                     {/* Maplibre MiniMap */}

@@ -54,6 +54,11 @@ export interface PhotoManifestItem extends PhotoInfo {
   size: number
   exif: PickedExif | null
   toneAnalysis: ToneAnalysis | null // 影调分析结果
+  location?: {
+    city: string | null
+    province: string | null
+    country: string | null
+  } | null
   isLivePhoto?: boolean
   isHDR?: boolean
   livePhotoVideoUrl?: string
