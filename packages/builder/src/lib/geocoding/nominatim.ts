@@ -45,8 +45,9 @@ async function saveCache(): Promise<void> {
 }
 
 const roundCoord = (n: number, decimals = 3) => Number(n.toFixed(decimals))
+const LANGUAGE = 'en'
 const makeKey = (lat: number, lon: number) =>
-  `${roundCoord(lat)},${roundCoord(lon)}`
+  `${roundCoord(lat)},${roundCoord(lon)}:${LANGUAGE}`
 
 let queue: Promise<unknown> = Promise.resolve()
 let lastAt = 0
@@ -116,7 +117,7 @@ export async function reverseGeocode(
   const p = schedule(async () => {
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${encodeURIComponent(
       lat,
-    )}&lon=${encodeURIComponent(lon)}&format=json`
+    )}&lon=${encodeURIComponent(lon)}&format=json&accept-language=${LANGUAGE}`
     try {
       const res = await fetch(url, {
         headers: {
