@@ -121,6 +121,7 @@ export async function reverseGeocode(
       const res = await fetch(url, {
         headers: {
           Accept: 'application/json',
+          'Accept-Language': 'en',
           'User-Agent': 'afilmory-builder/1.0',
         },
       })
