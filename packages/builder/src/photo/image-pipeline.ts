@@ -16,6 +16,7 @@ import type { PhotoManifestItem } from '../types/photo.js'
 import { shouldProcessPhoto } from './cache-manager.js'
 import {
   processExifData,
+  processLocation,
   processThumbnailAndBlurhash,
   processToneAnalysis,
 } from './data-processors.js'
@@ -228,6 +229,12 @@ export async function executePhotoProcessingPipeline(
       size: obj.Size || 0,
       exif: exifData,
       toneAnalysis,
+      location: await processLocation(
+        exifData,
+        photoKey,
+        existingItem,
+        options,
+      ),
       // Live Photo 相关字段
       isLivePhoto: livePhotoResult.isLivePhoto,
       livePhotoVideoUrl: livePhotoResult.livePhotoVideoUrl,
