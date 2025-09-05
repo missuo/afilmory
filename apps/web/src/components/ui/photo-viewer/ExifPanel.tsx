@@ -34,7 +34,7 @@ export const ExifPanel: FC<{
 
   onClose?: () => void
 }> = ({ currentPhoto, exifData, onClose }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isMobile = useMobile()
   const formattedExifData = formatExifData(exifData)
   const isExiftoolLoaded = useAtomValue(isExiftoolLoadedAtom)
@@ -48,16 +48,31 @@ export const ExifPanel: FC<{
   const locationDisplay = useMemo(() => {
     const loc = currentPhoto.location
     if (!loc) return null
+
+    // Allow showing detailed location directly from Nominatim's display_name
+    const showDetailed =
+      (import.meta as any).env?.VITE_SHOW_DETAILED_LOCATION === 'true'
+    if (showDetailed && loc.displayName) return loc.displayName
+
     const city = loc.city || null
     const province = loc.province || null
     const country = loc.country || null
 
-    if (city && country) {
-      return province
-        ? `${city}, ${province}, ${country}`
-        : `${city}, ${country}`
-    }
-    return null
+    // Order rule: default "city, province, country"; for zh/ja languages use "country province city"
+    const lang = (navigator?.language || 'en').toLowerCase()
+    const activeLang = (i18n?.language || lang).toLowerCase()
+    const isEastAsiaOrder =
+      activeLang.startsWith('zh') ||
+      activeLang.startsWith('ja') ||
+      activeLang === 'jp'
+
+    const parts = isEastAsiaOrder
+      ? [country, province, city].filter(Boolean)
+      : [city, province, country].filter(Boolean)
+
+    if (parts.length === 0) return null
+    // For East Asian order, use spaces; otherwise commas
+    return isEastAsiaOrder ? parts.join(' ') : parts.join(', ')
   }, [currentPhoto])
 
   // 使用通用的图片格式提取函数
