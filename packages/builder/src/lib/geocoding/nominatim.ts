@@ -7,6 +7,7 @@ export type ReverseGeocodeResult = {
   city: string | null
   province: string | null
   country: string | null
+  displayName?: string | null
 }
 
 type NominatimResponse = {
@@ -45,9 +46,8 @@ async function saveCache(): Promise<void> {
 }
 
 const roundCoord = (n: number, decimals = 3) => Number(n.toFixed(decimals))
-const LANGUAGE = 'en'
-const makeKey = (lat: number, lon: number) =>
-  `${roundCoord(lat)},${roundCoord(lon)}:${LANGUAGE}`
+const makeKey = (lat: number, lon: number, lang: string) =>
+  `${roundCoord(lat)},${roundCoord(lon)}@${lang}`
 
 let queue: Promise<unknown> = Promise.resolve()
 let lastAt = 0
@@ -103,7 +103,8 @@ export async function reverseGeocode(
 ): Promise<ReverseGeocodeResult | null> {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null
   await loadCache()
-  const key = makeKey(lat, lon)
+  const acceptLanguage = (process.env.NOMINATIM_ACCEPT_LANGUAGE || 'en').trim()
+  const key = makeKey(lat, lon, acceptLanguage)
 
   // cache hit
   const hit = cache![key]
@@ -117,18 +118,22 @@ export async function reverseGeocode(
   const p = schedule(async () => {
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${encodeURIComponent(
       lat,
-    )}&lon=${encodeURIComponent(lon)}&format=json&accept-language=${LANGUAGE}`
+    )}&lon=${encodeURIComponent(lon)}&format=json&accept-language=${encodeURIComponent(
+      acceptLanguage,
+    )}`
     try {
       const res = await fetch(url, {
         headers: {
           Accept: 'application/json',
-          'Accept-Language': 'en',
           'User-Agent': 'afilmory-builder/1.0',
         },
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = (await res.json()) as NominatimResponse
-      const result = extractCityProvinceCountry(data)
+      const result = {
+        ...extractCityProvinceCountry(data),
+        displayName: data.display_name || null,
+      }
       cache![key] = { v: result, t: Date.now() }
       await saveCache()
       return result
@@ -138,6 +143,7 @@ export async function reverseGeocode(
         city: null,
         province: null,
         country: null,
+        displayName: null,
       }
       cache![key] = { v: result, t: Date.now() }
       await saveCache()

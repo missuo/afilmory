@@ -58,6 +58,7 @@ export interface PhotoManifestItem extends PhotoInfo {
     city: string | null
     province: string | null
     country: string | null
+    displayName?: string | null
   } | null
   isLivePhoto?: boolean
   isHDR?: boolean

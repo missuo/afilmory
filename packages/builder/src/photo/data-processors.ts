@@ -171,6 +171,7 @@ export async function processLocation(
       city: geo.city,
       province: geo.province,
       country: geo.country,
+      displayName: geo.displayName || null,
     }
   } catch (e) {
     loggers.main.warn('反向地理编码失败，已跳过：', e)
