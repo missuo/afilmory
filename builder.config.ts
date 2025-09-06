@@ -56,6 +56,12 @@ export interface BuilderConfig {
     logFilePath?: string
   }
 
+  // 地理编码配置
+  geocoding: {
+    // Nominatim API 接受的语言
+    acceptLanguage: string
+  }
+
   // 性能优化配置
   performance: {
     // Worker 池配置
@@ -101,6 +107,10 @@ export const defaultBuilderConfig: BuilderConfig = {
     showProgress: true,
     showDetailedStats: true,
     digestSuffixLength: 0,
+  },
+
+  geocoding: {
+    acceptLanguage: 'en',
   },
 
   logging: {

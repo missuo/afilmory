@@ -12,5 +12,8 @@
   "map": [
     "maplibre"
   ],
-  "mapStyle": "builtin"
+  "mapStyle": "builtin",
+  "ui": {
+    "showDetailedLocation": false
+  }
 }

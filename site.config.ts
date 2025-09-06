@@ -13,6 +13,9 @@ export interface SiteConfig {
   feed?: Feed
   map?: MapConfig
   mapStyle?: string
+  ui?: {
+    showDetailedLocation?: boolean
+  }
 }
 
 /**
@@ -52,6 +55,9 @@ const defaultConfig: SiteConfig = {
     name: 'Innei',
     url: 'https://innei.in/',
     avatar: 'https://cdn.jsdelivr.net/gh/Innei/static@master/avatar.png',
+  },
+  ui: {
+    showDetailedLocation: false,
   },
 }
 export const siteConfig: SiteConfig = merge(defaultConfig, userConfig) as any

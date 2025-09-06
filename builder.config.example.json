@@ -6,5 +6,8 @@
     "prefix": "photos/",
     "customDomain": "https://cdn.example.com",
     "endpoint": "https://s3.amazonaws.com"
+  },
+  "geocoding": {
+    "acceptLanguage": "en"
   }
 }

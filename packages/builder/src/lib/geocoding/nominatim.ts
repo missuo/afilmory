@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import { builderConfig } from '@builder'
+
 import { workdir } from '../../path.js'
 
 export type ReverseGeocodeResult = {
@@ -103,7 +105,7 @@ export async function reverseGeocode(
 ): Promise<ReverseGeocodeResult | null> {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null
   await loadCache()
-  const acceptLanguage = (process.env.NOMINATIM_ACCEPT_LANGUAGE || 'en').trim()
+  const {acceptLanguage} = builderConfig.geocoding
   const key = makeKey(lat, lon, acceptLanguage)
 
   // cache hit

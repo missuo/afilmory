@@ -1,6 +1,7 @@
 import './PhotoViewer.css'
 
 import type { PhotoManifestItem, PickedExif } from '@afilmory/builder'
+import { siteConfig } from '@config'
 import { isNil } from 'es-toolkit/compat'
 import { useAtomValue } from 'jotai'
 import { m } from 'motion/react'
@@ -50,8 +51,7 @@ export const ExifPanel: FC<{
     if (!loc) return null
 
     // Allow showing detailed location directly from Nominatim's display_name
-    const showDetailed =
-      (import.meta as any).env?.VITE_SHOW_DETAILED_LOCATION === 'true'
+    const showDetailed = siteConfig.ui?.showDetailedLocation || false
     if (showDetailed && loc.displayName) return loc.displayName
 
     const city = loc.city || null
